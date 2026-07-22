@@ -8,6 +8,12 @@ It demonstrates how to create and register a simple MCP tool using the MCP SDK a
 
 ---
 
+## Academy
+
+This project is part of the MCP Academy training program:
+
+https://nextflows.ai/
+
 ## Purpose
 
 The purpose of this project is to learn the fundamentals of MCP servers, understand how tools are registered, validate user input using Zod, and connect the server with MCP Inspector.
@@ -146,14 +152,6 @@ Through this project, I learned:
 GitHub Repository:
 
 https://github.com/nourmohammadd/first-mcp-server
-
----
-
-## Academy
-
-MCP Academy:
-
-https://nextflows.ai/
 
 ---
 

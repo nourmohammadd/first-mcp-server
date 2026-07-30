@@ -35,3 +35,19 @@ export const searchQuotesInputSchema = z.object({
     .optional()
     .describe("Maximum number of quotes to return. Defaults to 10."),
 });
+
+/*
+Tool: get_quote_by_author
+*/
+export const getQuoteByAuthorInputSchema = z.object({
+  author: z
+    .string()
+    .min(1)
+    .max(100)
+    .describe("Author name to filter quotes by."),
+});
+
+/*
+Tool: list_categories
+*/
+export const listCategoriesInputSchema = z.object({});

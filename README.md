@@ -147,6 +147,18 @@ Through this project, I learned:
 
 ---
 
+## Week 2
+
+Skeleton for all 5 planned tools registered (P0 return stub JSON, P1 return "not implemented yet").
+
+Run in dev mode:
+```bash
+npm run dev
+```
+
+---
+
+
 ## Repository
 
 GitHub Repository:

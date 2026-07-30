@@ -1,32 +1,26 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { z } from "zod";
+import { McpServer } from "@modelcontextprotocol/server";
+import { serveStdio } from "@modelcontextprotocol/server/stdio";
 
-const server = new McpServer({
-  name: "first-mcp-server",
-  version: "1.0.0",
-});
+import { registerGetQuoteOfTheDay } from "./tools/getQuoteOfTheDay.js";
+import { registerGetRandomQuote } from "./tools/getRandomQuote.js";
+import { registerSearchQuotes } from "./tools/searchQuotes.js";
+import { registerGetQuoteByAuthor } from "./tools/getQuoteByAuthor.js";
+import { registerListCategories } from "./tools/listCategories.js";
 
-server.tool(
-  "greet",
-  "Generate a greeting message",
-  {
-    name: z.string(),
-  },
-  async ({ name }) => {
-    return {
-      content: [
-        {
-          type: "text",
-          text: `Hello ${name}! Welcome to MCP.`,
-        },
-      ],
-    };
-  }
-);
+function createServer(): McpServer {
+  const server = new McpServer({
+    name: "first-mcp-server",
+    version: "0.2.0",
+  });
 
-console.error("MCP server running");
+  registerGetQuoteOfTheDay(server);
+  registerGetRandomQuote(server);
+  registerSearchQuotes(server);
+  registerGetQuoteByAuthor(server);
+  registerListCategories(server);
 
-const transport = new StdioServerTransport();
+  return server;
+}
 
-await server.connect(transport);
+void serveStdio(createServer);
+console.error("first-mcp-server MCP server running on stdio");

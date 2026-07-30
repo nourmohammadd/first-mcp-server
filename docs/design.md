@@ -40,3 +40,19 @@ Students, developers, and anyone who wants quick access to inspirational quotes 
 - Users can search quotes.
 - Users can retrieve quotes by author.
 - Input validation works using Zod.
+
+## User & Demo Story
+
+A user asks the AI assistant for today's inspirational quote. The assistant calls the get_quote_of_the_day tool and displays the quote. The user then asks for more quotes by the same author, and the assistant uses get_quote_by_author to return matching quotes.
+
+## Risks
+
+### Risk 1
+The external quote API may become unavailable.
+
+**Mitigation:** Keep a local JSON file with sample quotes.
+
+### Risk 2
+Limited development time.
+
+**Mitigation:** Complete all P0 tools first before working on P1 tools.

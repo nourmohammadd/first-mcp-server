@@ -14,7 +14,7 @@ export const getRandomQuoteInputSchema = z.object({
     .min(1)
     .max(50)
     .optional()
-    .describe("Optional category of the quote, such as motivation or success."),
+    .describe("Optional quote category such as motivation, success, or happiness."),
 });
 
 /*
@@ -25,7 +25,7 @@ export const searchQuotesInputSchema = z.object({
     .string()
     .min(1)
     .max(100)
-    .describe("Keyword used to search for quotes."),
+    .describe("Keyword used to search for matching quotes."),
 
   limit: z
     .number()

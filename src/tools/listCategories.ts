@@ -15,3 +15,5 @@ export function registerListCategories(server: McpServer) {
     }
   );
 }
+
+// P1 stub — not implemented yet

@@ -1,5 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/server";
 import { getQuoteOfTheDayInputSchema } from "../schemas/index.js";
+import { getQuoteOfTheDay } from "../lib/quotes.js";
 
 export function registerGetQuoteOfTheDay(server: McpServer) {
   server.registerTool(
@@ -9,16 +10,20 @@ export function registerGetQuoteOfTheDay(server: McpServer) {
       inputSchema: getQuoteOfTheDayInputSchema,
     },
     async () => {
-      // Week 2: stub only — Week 3 replaces this with real data
+      const quote = getQuoteOfTheDay();
+
+      if (!quote) {
+        console.error("[get_quote_of_the_day] no quotes available");
+        return {
+          content: [{ type: "text", text: "No quotes available right now." }],
+        };
+      }
+
       return {
         content: [
           {
             type: "text",
-            text: JSON.stringify(
-              { ok: true, stub: true, tool: "get_quote_of_the_day" },
-              null,
-              2
-            ),
+            text: JSON.stringify(quote, null, 2),
           },
         ],
       };

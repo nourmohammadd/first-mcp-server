@@ -1,5 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/server";
 import { searchQuotesInputSchema } from "../schemas/index.js";
+import { searchQuotes } from "../lib/quotes.js";
 
 export function registerSearchQuotes(server: McpServer) {
   server.registerTool(
@@ -9,15 +10,22 @@ export function registerSearchQuotes(server: McpServer) {
       inputSchema: searchQuotesInputSchema,
     },
     async (input) => {
+      const results = searchQuotes(input.keyword, input.limit ?? 10);
+
+      if (results.length === 0) {
+        console.error(`[search_quotes] no matches for keyword "${input.keyword}"`);
+        return {
+          content: [
+            { type: "text", text: `No quotes found matching "${input.keyword}".` },
+          ],
+        };
+      }
+
       return {
         content: [
           {
             type: "text",
-            text: JSON.stringify(
-              { ok: true, stub: true, tool: "search_quotes" },
-              null,
-              2
-            ),
+            text: JSON.stringify({ results, count: results.length }, null, 2),
           },
         ],
       };

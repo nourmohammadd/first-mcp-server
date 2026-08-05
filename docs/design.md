@@ -61,3 +61,8 @@ The public quote API may become unavailable or experience downtime.
 There may not be enough time to fully implement all planned features.
 
 **Mitigation:** Complete all P0 tools first and implement P1 tools only if time permits.
+
+## Resources (Week 5+)
+Not implemented this week due to time constraints. Planned: expose data/quotes.json 
+as a read-only resource (e.g. quotes://all) so the model can read the fixture 
+without a tool call. Will implement in a later week.

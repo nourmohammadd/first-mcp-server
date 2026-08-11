@@ -23,6 +23,7 @@ Tool: search_quotes
 export const searchQuotesInputSchema = z.object({
   keyword: z
     .string()
+    .trim()
     .min(1)
     .max(100)
     .describe("Keyword used to search for matching quotes."),

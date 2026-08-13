@@ -86,3 +86,17 @@ export function searchQuotes(keyword: string, limit = 10): Quote[] {
     )
     .slice(0, limit);
 }
+
+export function getQuoteByAuthor(author: string): Quote[] {
+  const quotes = loadQuotes();
+  const lowerAuthor = author.toLowerCase();
+
+  return quotes.filter((q) => q.author.toLowerCase() === lowerAuthor);
+}
+
+export function listCategories(): string[] {
+  const quotes = loadQuotes();
+  const categories = new Set(quotes.map((q) => q.category));
+  return Array.from(categories).sort();
+}
+

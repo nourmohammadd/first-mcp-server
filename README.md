@@ -1,10 +1,10 @@
-# First MCP Server
+# First MCP Server — Quote of the Day
 
 ## Description
 
-This project is my first **Model Context Protocol (MCP) server** built with TypeScript.
-
-It demonstrates how to create and register a simple MCP tool using the MCP SDK and Zod for input validation. The server communicates over **stdio** and can be tested using **MCP Inspector**.
+This is a **Model Context Protocol (MCP) server** built with TypeScript that serves quotes 
+through 5 registered tools. It reads from a local JSON fixture, validates all input with 
+Zod, and communicates over **stdio**. Built and tested using **MCP Inspector**.
 
 ---
 
@@ -14,20 +14,29 @@ This project is part of the MCP Academy training program:
 
 https://nextflows.ai/
 
+Mentor: Mohammad Jaradat
+
+---
+
 ## Purpose
 
-The purpose of this project is to learn the fundamentals of MCP servers, understand how tools are registered, validate user input using Zod, and connect the server with MCP Inspector.
+Learn the fundamentals of building a real MCP server: registering multiple tools, wiring 
+them to real data, validating input with Zod, hardening against common risks (path 
+traversal, SSRF, unvalidated input), and following a security-first development process.
 
 ---
 
 ## Features
 
-- MCP server built with TypeScript
-- One custom tool called `greet`
-- Input validation using Zod
+- 5 MCP tools registered and fully implemented (see below)
+- Real data served from a local fixture (`data/quotes.json`) — no external API dependency
+- Input validation on every tool using Zod (min/max length, trim, type checks)
+- Path traversal protection on all file reads (`resolveDataPath`)
+- Host allowlist + timeout on the shared fetch helper (for future API-based tools)
+- No secrets in the repo — `.gitignore` excludes `.env*`, `.env.example` documents expected variables
 - Communication over stdio transport
 - Compatible with MCP Inspector
-- Managed using Git and GitHub
+- Managed using Git and GitHub, with peer-reviewed hardening PR
 
 ---
 
@@ -35,26 +44,47 @@ The purpose of this project is to learn the fundamentals of MCP servers, underst
 
 - Node.js
 - TypeScript
-- MCP SDK
+- `@modelcontextprotocol/server` SDK
 - Zod
 - MCP Inspector
 
 ---
 
 ## Project Structure
-
-```
 first-mcp-server/
 │
 ├── src/
-│   └── index.ts          # MCP server implementation
+│ ├── index.ts # createServer() factory + serveStdio entry point
+│ ├── lib/
+│ │ ├── quotes.ts # pure functions: load/filter/search quotes
+│ │ └── http.ts # shared fetchJson helper (timeout + host allowlist)
+│ ├── schemas/
+│ │ └── index.ts # Zod input schemas for every tool
+│ └── tools/
+│ ├── getQuoteOfTheDay.ts
+│ ├── getRandomQuote.ts
+│ ├── searchQuotes.ts
+│ ├── getQuoteByAuthor.ts
+│ └── listCategories.ts
 │
+├── data/
+│ └── quotes.json # local fixture — quote bank (source of truth)
+│
+├── docs/
+│ ├── project-choice.md
+│ ├── design.md # tool inventory, priorities (P0/P1)
+│ ├── data-plan.md # per-tool data source, fixture path, failure modes
+│ ├── threat-model.md # assets, trust boundaries, top risks, mitigations
+│ └── review-checklist.md # peer review notes + action items
+│
+├── examples/ # one sample input JSON per tool
+├── SECURITY.md # how to report issues, what's hardened
 ├── package.json
 ├── package-lock.json
 ├── tsconfig.json
 ├── .gitignore
+├── .env.example
 └── README.md
-```
 
 ---
 
@@ -64,15 +94,16 @@ Clone the repository:
 
 ```bash
 git clone https://github.com/nourmohammadd/first-mcp-server.git
-```
-
-Move into the project folder:
-
-```bash
 cd first-mcp-server
 ```
 
-Install the required dependencies:
+Check out the latest working branch (until merged to `main`):
+
+```bash
+git checkout week-4-harden
+```
+
+Install dependencies:
 
 ```bash
 npm install
@@ -82,55 +113,62 @@ npm install
 
 ## Running the Project
 
-Start the MCP server:
+Dev mode:
 
 ```bash
-npx tsx src/index.ts
+npm run dev
 ```
 
+You should see: first-mcp-server MCP server running on stdio
 ---
 
 ## Testing with MCP Inspector
-
-Run the server using MCP Inspector:
 
 ```bash
 npx @modelcontextprotocol/inspector npx tsx src/index.ts
 ```
 
-Then open the provided URL in your browser.
+Then open the URL printed in the terminal, click **Connect**, and go to the **Tools** tab.
 
-Using MCP Inspector:
-
-1. Open the **Tools** tab.
-2. Select the `greet` tool.
-3. Provide a valid input.
-4. Run the tool and check the response.
-5. Test invalid inputs to verify Zod schema validation.
+1. Select a tool from the list.
+2. Fill in a valid sample input (see `examples/<tool_name>.json` for a starting point).
+3. Click **Run Tool** and check the response.
+4. Try an invalid input (e.g. empty `keyword`) to confirm Zod rejects it cleanly.
 
 ---
 
-## Available Tool
+## Available Tools
 
-### greet(name)
+### `get_quote_of_the_day()`
+Returns a deterministic "quote of the day" based on the current date.
 
-A simple MCP tool that receives a name and returns a greeting message.
+### `get_random_quote(category?)`
+Returns a random quote, optionally filtered by category.
 
-Example:
+### `search_quotes(keyword, limit?)`
+Returns quotes whose text or author matches the given keyword (max 20 results).
 
-Input:
+### `get_quote_by_author(author)`
+Returns all quotes by a given author.
 
-```text
-Nour
-```
+### `list_categories()`
+Returns the list of all distinct quote categories in the fixture.
 
-Output:
+All tools read from `data/quotes.json` via pure functions in `src/lib/quotes.ts`, 
+separated from tool registration in `src/tools/`.
 
-```text
-Hello Nour! Welcome to MCP.
-```
+---
 
-The tool uses Zod validation to verify that the input format is correct before executing.
+## Security
+
+See [`SECURITY.md`](./SECURITY.md) and [`docs/threat-model.md`](./docs/threat-model.md) 
+for the full threat model and hardening details. Summary:
+
+- File reads restricted to `./data` (path traversal protection)
+- All tool inputs validated with Zod (length caps, trimming, type checks)
+- Network calls (when used) go through an explicit host allowlist with an 8s timeout
+- No secrets in the repo or git history
+- Error messages returned to the model are short and generic; details are logged to stderr only
 
 ---
 
@@ -138,18 +176,22 @@ The tool uses Zod validation to verify that the input format is correct before e
 
 Through this project, I learned:
 
-- The basics of Model Context Protocol (MCP).
-- How MCP servers work.
-- How to create and register MCP tools.
-- How to validate inputs using Zod.
-- How to test MCP servers using MCP Inspector.
-- How to manage a project using Git and GitHub.
+- The basics of Model Context Protocol (MCP) and how servers/tools are structured
+- How to register multiple tools with `registerTool` and separate pure logic from registration
+- How to validate inputs using Zod schemas
+- How to wire real data (local fixtures) into tool handlers safely
+- How to write a threat model and apply concrete mitigations (allowlists, path checks, timeouts)
+- How to test MCP servers using MCP Inspector, including deliberately triggering failures
+- How to manage a multi-week project using Git branches, PRs, and peer code review
 
 ---
 
-## Week 2
+## Project Progress
 
-Skeleton for all 5 planned tools registered (P0 return stub JSON, P1 return "not implemented yet").
+- **Week 2** — Registered all 5 planned tools as stubs; verified discoverability in Inspector.
+- **Week 3** — Wired 3 P0 tools to real data from `data/quotes.json`; documented the data plan.
+- **Week 4** — Wrote a threat model, added input validation hardening (trim, length caps), 
+  a host allowlist for future network calls, `SECURITY.md`, and completed a peer code review.
 
 Run in dev mode:
 ```bash
@@ -158,10 +200,7 @@ npm run dev
 
 ---
 
-
 ## Repository
-
-GitHub Repository:
 
 https://github.com/nourmohammadd/first-mcp-server
 

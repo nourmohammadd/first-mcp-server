@@ -1,211 +1,97 @@
 # First MCP Server — Quote of the Day
 
-## Description
+## What it does
+An MCP server that serves quotes from a local fixture through 5 tools: get today's 
+quote, get a random quote, search by keyword, get quotes by author, and list all 
+categories. Built with TypeScript and the `@modelcontextprotocol/server` SDK. All 
+input is validated with Zod, and the server communicates over stdio.
 
-This is a **Model Context Protocol (MCP) server** built with TypeScript that serves quotes 
-through 5 registered tools. It reads from a local JSON fixture, validates all input with 
-Zod, and communicates over **stdio**. Built and tested using **MCP Inspector**.
+## Requirements
+- Node.js 20+
+- npm
+
+## Install
+```bash
+git clone https://github.com/nourmohammadd/first-mcp-server.git
+cd first-mcp-server
+git checkout week-4-harden
+npm install
+```
+
+## Run
+```bash
+npm run dev
+```
+You should see: first-mcp-server MCP server running on stdio
+## Inspector command
+```bash
+npx @modelcontextprotocol/inspector npx tsx src/index.ts
+```
+Open the URL printed in the terminal, click **Connect**, then go to the **Tools** tab.
+
+## Tools
+
+| Tool | Description | Example input |
+|---|---|---|
+| `get_quote_of_the_day` | Returns a deterministic quote based on today's date | `{}` |
+| `get_random_quote` | Returns a random quote, optionally filtered by category | `{ "category": "success" }` |
+| `search_quotes` | Searches quotes by keyword in text or author (max 20 results) | `{ "keyword": "success", "limit": 5 }` |
+| `get_quote_by_author` | Returns all quotes by a given author | `{ "author": "Maya Angelou" }` |
+| `list_categories` | Returns all distinct categories in the fixture | `{}` |
+
+## Example prompts
+- "Give me today's quote."
+- "Show me a random motivational quote."
+- "Find quotes about success."
+
+## Troubleshooting
+
+**1. `ERR_MODULE_NOT_FOUND: @modelcontextprotocol/server`**
+Run `npm install` before starting the server — dependencies aren't included in the repo.
+
+**2. Inspector shows "Failed" / red connection status**
+Make sure you ran `npm install` first, and that you're on the `week-4-harden` branch 
+(`git branch` to check), since that's where `@modelcontextprotocol/server` was added.
+
+**3. `search_quotes` or `get_quote_by_author` returns a validation error**
+Required fields can't be empty or whitespace-only — `keyword` and `author` must be 
+at least 1 character.
+
+## License
+MIT — student project, MCP Academy cohort (nextflows.ai).
 
 ---
 
-## Academy
+## Additional Details
 
-This project is part of the MCP Academy training program:
-
-https://nextflows.ai/
-
-Mentor: Mohammad Jaradat
-
----
-
-## Purpose
-
-Learn the fundamentals of building a real MCP server: registering multiple tools, wiring 
-them to real data, validating input with Zod, hardening against common risks (path 
-traversal, SSRF, unvalidated input), and following a security-first development process.
-
----
-
-## Features
-
-- 5 MCP tools registered and fully implemented (see below)
-- Real data served from a local fixture (`data/quotes.json`) — no external API dependency
-- Input validation on every tool using Zod (min/max length, trim, type checks)
-- Path traversal protection on all file reads (`resolveDataPath`)
-- Host allowlist + timeout on the shared fetch helper (for future API-based tools)
-- No secrets in the repo — `.gitignore` excludes `.env*`, `.env.example` documents expected variables
-- Communication over stdio transport
-- Compatible with MCP Inspector
-- Managed using Git and GitHub, with peer-reviewed hardening PR
-
----
-
-## Technologies
-
-- Node.js
-- TypeScript
-- `@modelcontextprotocol/server` SDK
-- Zod
-- MCP Inspector
-
----
-
-## Project Structure
+### Project Structure
 first-mcp-server/
-│
 ├── src/
 │ ├── index.ts # createServer() factory + serveStdio entry point
 │ ├── lib/
 │ │ ├── quotes.ts # pure functions: load/filter/search quotes
 │ │ └── http.ts # shared fetchJson helper (timeout + host allowlist)
-│ ├── schemas/
-│ │ └── index.ts # Zod input schemas for every tool
-│ └── tools/
-│ ├── getQuoteOfTheDay.ts
-│ ├── getRandomQuote.ts
-│ ├── searchQuotes.ts
-│ ├── getQuoteByAuthor.ts
-│ └── listCategories.ts
-│
-├── data/
-│ └── quotes.json # local fixture — quote bank (source of truth)
-│
-├── docs/
-│ ├── project-choice.md
-│ ├── design.md # tool inventory, priorities (P0/P1)
-│ ├── data-plan.md # per-tool data source, fixture path, failure modes
-│ ├── threat-model.md # assets, trust boundaries, top risks, mitigations
-│ └── review-checklist.md # peer review notes + action items
-│
-├── examples/ # one sample input JSON per tool
-├── SECURITY.md # how to report issues, what's hardened
-├── package.json
-├── package-lock.json
-├── tsconfig.json
-├── .gitignore
-├── .env.example
+│ ├── schemas/index.ts # Zod input schemas for every tool
+│ └── tools/ # one file per tool (registration + handler)
+├── data/quotes.json # local fixture — quote bank
+├── docs/ # design, data-plan, threat-model, review-checklist
+├── examples/ # sample input JSON per tool
+├── SECURITY.md
 └── README.md
 
----
-
-## Installation
-
-Clone the repository:
-
+### Testing
 ```bash
-git clone https://github.com/nourmohammadd/first-mcp-server.git
-cd first-mcp-server
+npm test
 ```
+Runs smoke tests for the pure helper functions in `src/lib/quotes.ts`.
 
-Check out the latest working branch (until merged to `main`):
-
-```bash
-git checkout week-4-harden
-```
-
-Install dependencies:
-
-```bash
-npm install
-```
-
----
-
-## Running the Project
-
-Dev mode:
-
-```bash
-npm run dev
-```
-
-You should see: first-mcp-server MCP server running on stdio
----
-
-## Testing with MCP Inspector
-
-```bash
-npx @modelcontextprotocol/inspector npx tsx src/index.ts
-```
-
-Then open the URL printed in the terminal, click **Connect**, and go to the **Tools** tab.
-
-1. Select a tool from the list.
-2. Fill in a valid sample input (see `examples/<tool_name>.json` for a starting point).
-3. Click **Run Tool** and check the response.
-4. Try an invalid input (e.g. empty `keyword`) to confirm Zod rejects it cleanly.
-
----
-
-## Available Tools
-
-### `get_quote_of_the_day()`
-Returns a deterministic "quote of the day" based on the current date.
-
-### `get_random_quote(category?)`
-Returns a random quote, optionally filtered by category.
-
-### `search_quotes(keyword, limit?)`
-Returns quotes whose text or author matches the given keyword (max 20 results).
-
-### `get_quote_by_author(author)`
-Returns all quotes by a given author.
-
-### `list_categories()`
-Returns the list of all distinct quote categories in the fixture.
-
-All tools read from `data/quotes.json` via pure functions in `src/lib/quotes.ts`, 
-separated from tool registration in `src/tools/`.
-
----
-
-## Security
-
+### Security
 See [`SECURITY.md`](./SECURITY.md) and [`docs/threat-model.md`](./docs/threat-model.md) 
-for the full threat model and hardening details. Summary:
+for the full threat model and hardening details.
 
-- File reads restricted to `./data` (path traversal protection)
-- All tool inputs validated with Zod (length caps, trimming, type checks)
-- Network calls (when used) go through an explicit host allowlist with an 8s timeout
-- No secrets in the repo or git history
-- Error messages returned to the model are short and generic; details are logged to stderr only
+### Academy
+Part of the MCP Academy training program: https://nextflows.ai/
+Mentor: Mohammad Jaradat
 
----
-
-## Learning Outcomes
-
-Through this project, I learned:
-
-- The basics of Model Context Protocol (MCP) and how servers/tools are structured
-- How to register multiple tools with `registerTool` and separate pure logic from registration
-- How to validate inputs using Zod schemas
-- How to wire real data (local fixtures) into tool handlers safely
-- How to write a threat model and apply concrete mitigations (allowlists, path checks, timeouts)
-- How to test MCP servers using MCP Inspector, including deliberately triggering failures
-- How to manage a multi-week project using Git branches, PRs, and peer code review
-
----
-
-## Project Progress
-
-- **Week 2** — Registered all 5 planned tools as stubs; verified discoverability in Inspector.
-- **Week 3** — Wired 3 P0 tools to real data from `data/quotes.json`; documented the data plan.
-- **Week 4** — Wrote a threat model, added input validation hardening (trim, length caps), 
-  a host allowlist for future network calls, `SECURITY.md`, and completed a peer code review.
-
-Run in dev mode:
-```bash
-npm run dev
-```
-
----
-
-## Repository
-
-https://github.com/nourmohammadd/first-mcp-server
-
----
-
-## Author
-
+### Author
 Nour Mohammad

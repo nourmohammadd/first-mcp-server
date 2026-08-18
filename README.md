@@ -14,7 +14,6 @@ input is validated with Zod, and the server communicates over stdio.
 ```bash
 git clone https://github.com/nourmohammadd/first-mcp-server.git
 cd first-mcp-server
-git checkout week-4-harden
 npm install
 ```
 
@@ -38,6 +37,10 @@ Open the URL printed in the terminal, click **Connect**, then go to the **Tools*
 | `search_quotes` | Searches quotes by keyword in text or author (max 20 results) | `{ "keyword": "success", "limit": 5 }` |
 | `get_quote_by_author` | Returns all quotes by a given author | `{ "author": "Maya Angelou" }` |
 | `list_categories` | Returns all distinct categories in the fixture | `{}` |
+
+
+See [`examples/conversations.md`](./examples/conversations.md) for example 
+conversations showing how a user might interact with this server.
 
 ## Example prompts
 - "Give me today's quote."
@@ -84,6 +87,36 @@ first-mcp-server/
 npm test
 ```
 Runs smoke tests for the pure helper functions in `src/lib/quotes.ts`.
+
+## Connect to Claude Desktop
+
+Add this to your `claude_desktop_config.json` (Claude Desktop → Settings → 
+Developer → Edit Config), replacing the paths with your own absolute repo path:
+
+\`\`\`json
+{
+  "mcpServers": {
+    "first-mcp-server": {
+      "command": "npx.cmd",
+      "args": ["-y", "tsx", "C:\\\\Users\\\\YOUR_USERNAME\\\\path\\\\to\\\\first-mcp-server\\\\src\\\\index.ts"],
+      "cwd": "C:\\\\Users\\\\YOUR_USERNAME\\\\path\\\\to\\\\first-mcp-server"
+    }
+  }
+}
+\`\`\`
+
+On macOS, use `"command": "npx"` and forward slashes in the paths instead.
+
+**Windows note:** use an absolute path to `index.ts` in `args` rather than the 
+relative `src/index.ts` — some Windows setups launch the process via a wrapped 
+shell command where `cwd` isn't reliably applied to module resolution. 
+`src/lib/quotes.ts` resolves the data folder from its own module location 
+(not `process.cwd()`) for the same reason, so it works regardless of the 
+working directory the process is launched from.
+
+Fully quit and reopen Claude Desktop after saving (config is only read at 
+startup). Your tools should then appear under the tools icon next to the 
+message box in a new chat. Try asking: "List all the quote categories you have."
 
 ### Security
 See [`SECURITY.md`](./SECURITY.md) and [`docs/threat-model.md`](./docs/threat-model.md) 

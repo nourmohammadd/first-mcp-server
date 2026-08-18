@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
-import { resolve, join } from "node:path";
+import { resolve, join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import * as z from "zod/v4";
 
 const quoteSchema = z.object({
@@ -13,9 +14,16 @@ const quotesFileSchema = z.array(quoteSchema);
 
 export type Quote = z.infer<typeof quoteSchema>;
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 // Only ever read files under ./data — reject any path escaping it.
+// Resolved from this module's own location (not process.cwd()) so it works
+// regardless of the working directory the process was launched from
+// (e.g. when started by Claude Desktop via a wrapped command).
 function resolveDataPath(filename: string): string {
-  const dataDir = resolve(process.cwd(), "data");
+  // src/lib/quotes.ts -> go up two levels to reach the repo root, then into data/
+  const dataDir = resolve(__dirname, "..", "..", "data");
   const fullPath = resolve(join(dataDir, filename));
   if (!fullPath.startsWith(dataDir)) {
     throw new Error(`Invalid data path: ${filename}`);
@@ -99,4 +107,3 @@ export function listCategories(): string[] {
   const categories = new Set(quotes.map((q) => q.category));
   return Array.from(categories).sort();
 }
-

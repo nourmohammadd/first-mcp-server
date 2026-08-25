@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Quote of the Day — MCP Server</title>
+<meta name="description" content="A TypeScript Model Context Protocol server that hands an AI host real quotes — search, filter, and lookup, backed by a local dataset." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#141210;
+    --ink-2:#1c1a17;
+    --parchment:#efe6d8;
+    --parchment-dim:#a89e8d;
+    --gold:#c99a4b;
+    --gold-soft:#e0bb7c;
+    --rule:#332e28;
+    --success:#7a8f6c;
+    --border-radius:2px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--ink);
+    color:var(--parchment);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--gold);color:var(--ink);}
+
+  a{color:inherit;}
+  .wrap{max-width:920px;margin:0 auto;padding:0 28px;}
+
+  /* ---------- Header ---------- */
+  header{
+    position:sticky;top:0;z-index:20;
+    background:rgba(20,18,16,0.88);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--rule);
+  }
+  .nav{
+    max-width:920px;margin:0 auto;padding:18px 28px;
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .brand{
+    font-family:'Fraunces',serif;font-size:19px;font-weight:500;
+    letter-spacing:0.01em; display:flex; align-items:center; gap:8px;
+  }
+  .brand .mark{color:var(--gold);font-size:24px;line-height:0;}
+  .nav-links{display:flex;gap:26px;align-items:center;font-size:14px;color:var(--parchment-dim);}
+  .nav-links a{text-decoration:none;transition:color .15s ease;}
+  .nav-links a:hover, .nav-links a:focus-visible{color:var(--gold-soft);}
+  .nav-links .gh{
+    color:var(--parchment);border:1px solid var(--rule);
+    padding:7px 14px;border-radius:var(--border-radius);
+    display:flex;align-items:center;gap:7px;
+  }
+  .nav-links .gh:hover{border-color:var(--gold);}
+  .nav-links .gh svg{width:15px;height:15px;fill:currentColor;}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    position:relative;
+    padding:96px 0 76px;
+    overflow:hidden;
+  }
+  .hero-mark{
+    position:absolute;top:-70px;left:50%;transform:translateX(-50%);
+    font-family:'Fraunces',serif;font-size:420px;line-height:1;
+    color:#221f1a;user-select:none;pointer-events:none;z-index:0;
+  }
+  .hero-inner{position:relative;z-index:1;text-align:center;}
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;letter-spacing:0.14em;
+    text-transform:uppercase;color:var(--gold);margin:0 0 22px;
+  }
+  h1{
+    font-family:'Fraunces',serif;font-weight:500;
+    font-size:clamp(32px,5vw,52px);line-height:1.12;
+    margin:0 auto 20px;max-width:680px;letter-spacing:-0.01em;
+  }
+  h1 em{color:var(--gold-soft);font-style:italic;}
+  .sub{
+    color:var(--parchment-dim);font-size:16.5px;line-height:1.6;
+    max-width:520px;margin:0 auto 42px;
+  }
+
+  .cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:64px;}
+  .btn{
+    font-family:'Inter',sans-serif;font-size:14.5px;font-weight:600;
+    padding:13px 24px;border-radius:var(--border-radius);
+    text-decoration:none;display:inline-flex;align-items:center;gap:9px;
+    transition:transform .15s ease, background .15s ease, border-color .15s ease;
+  }
+  .btn:hover{transform:translateY(-1px);}
+  .btn-primary{background:var(--gold);color:var(--ink);}
+  .btn-primary:hover{background:var(--gold-soft);}
+  .btn-outline{border:1px solid var(--rule);color:var(--parchment);}
+  .btn-outline:hover{border-color:var(--gold);}
+  .btn svg{width:16px;height:16px;fill:currentColor;}
+
+  /* ---------- Quote card ---------- */
+  .quote-card{
+    max-width:600px;margin:0 auto;
+    background:var(--ink-2);
+    border:1px solid var(--rule);
+    border-radius:var(--border-radius);
+    padding:40px 44px;
+    text-align:left;
+    position:relative;
+  }
+  .quote-card::before{
+    content:"get_quote_of_the_day()";
+    position:absolute;top:-11px;left:24px;
+    background:var(--ink);padding:0 10px;
+    font-family:'IBM Plex Mono',monospace;font-size:11px;
+    color:var(--parchment-dim);letter-spacing:0.03em;
+  }
+  .qtext{
+    font-family:'Fraunces',serif;font-style:italic;font-weight:400;
+    font-size:21px;line-height:1.5;margin:8px 0 18px;
+    min-height:76px;
+    transition:opacity .35s ease;
+  }
+  .qmeta{display:flex;align-items:center;justify-content:space-between;font-size:13.5px;}
+  .qauthor{color:var(--gold-soft);font-weight:500;}
+  .qcat{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;
+    color:var(--parchment-dim);border:1px solid var(--rule);
+    padding:3px 9px;border-radius:20px;text-transform:lowercase;
+  }
+  .fade-out{opacity:0;}
+
+  /* ---------- Tools ---------- */
+  .section{padding:68px 0;border-top:1px solid var(--rule);}
+  .section-head{margin-bottom:36px;}
+  .section-eyebrow{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.12em;
+    text-transform:uppercase;color:var(--gold);margin:0 0 10px;
+  }
+  h2{
+    font-family:'Fraunces',serif;font-weight:500;font-size:28px;margin:0;
+  }
+  .tools{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--rule);border:1px solid var(--rule);}
+  .tool{background:var(--ink);padding:24px 26px;}
+  .tool-name{
+    font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--gold-soft);
+    margin:0 0 8px;
+  }
+  .tool-desc{color:var(--parchment-dim);font-size:14px;line-height:1.55;margin:0;}
+  @media (max-width:640px){ .tools{grid-template-columns:1fr;} }
+
+  /* ---------- Footer ---------- */
+  footer{
+    border-top:1px solid var(--rule);
+    padding:36px 0 44px;
+    font-size:13.5px;color:var(--parchment-dim);
+  }
+  .foot-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;}
+  footer a{text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--rule);}
+  footer a:hover{color:var(--gold-soft);text-decoration-color:var(--gold-soft);}
+
+  @media (prefers-reduced-motion: reduce){
+    .qtext{transition:none;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <div class="brand"><span class="mark">❝</span> Quote of the Day</div>
+    <nav class="nav-links">
+      <a href="https://nextflows.ai/" target="_blank" rel="noopener">Academy</a>
+      <a class="gh" href="https://github.com/nourmohammadd/first-mcp-server" target="_blank" rel="noopener">
+        <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub
+      </a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-mark" aria-hidden="true">❝</div>
+  <div class="wrap hero-inner">
+    <p class="eyebrow">Model Context Protocol · TypeScript</p>
+    <h1>An MCP server that hands your AI <em>real words</em>, not guesses.</h1>
+    <p class="sub">Five typed, Zod-validated tools connect any MCP-compatible host — Claude Desktop, Inspector, and others — to a real quote dataset. No hallucinated citations.</p>
+
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://github.com/nourmohammadd/first-mcp-server" target="_blank" rel="noopener">
+        <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        View source on GitHub
+      </a>
+      <a class="btn btn-outline" href="https://nextflows.ai/" target="_blank" rel="noopener">
+        NextFlows Academy →
+      </a>
+    </div>
+
+    <div class="quote-card">
+      <p class="qtext" id="qtext">Loading today's quote…</p>
+      <div class="qmeta">
+        <span class="qauthor" id="qauthor"></span>
+        <span class="qcat" id="qcat"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="section-eyebrow">What it exposes</p>
+      <h2>Five tools, one dataset</h2>
+    </div>
+    <div class="tools">
+      <div class="tool">
+        <p class="tool-name">get_quote_of_the_day</p>
+        <p class="tool-desc">A deterministic pick for today, same all day.</p>
+      </div>
+      <div class="tool">
+        <p class="tool-name">get_random_quote</p>
+        <p class="tool-desc">Random quote, optionally filtered by category.</p>
+      </div>
+      <div class="tool">
+        <p class="tool-name">search_quotes</p>
+        <p class="tool-desc">Keyword search across quote text and author.</p>
+      </div>
+      <div class="tool">
+        <p class="tool-name">get_quote_by_author</p>
+        <p class="tool-desc">All quotes attributed to one author.</p>
+      </div>
+      <div class="tool">
+        <p class="tool-name">list_categories</p>
+        <p class="tool-desc">Every distinct category in the dataset.</p>
+      </div>
+      <div class="tool">
+        <p class="tool-name">stdio · Zod · Node 20+</p>
+        <p class="tool-desc">Path-restricted reads, validated input, no secrets.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-row">
+    <span>Built for <a href="https://nextflows.ai/" target="_blank" rel="noopener">NextFlows Academy</a> — Nour Mohammad</span>
+    <a href="https://github.com/nourmohammadd/first-mcp-server" target="_blank" rel="noopener">github.com/nourmohammadd/first-mcp-server</a>
+  </div>
+</footer>
+
+<script>
+  const quotes = [
+    { quote:"In the middle of difficulty lies opportunity.", author:"Albert Einstein", category:"motivation" },
+    { quote:"Success is where preparation and opportunity meet.", author:"Bobby Unser", category:"success" },
+    { quote:"Don't watch the clock; do what it does. Keep going.", author:"Sam Levenson", category:"motivation" },
+    { quote:"Happiness is not something ready made. It comes from your own actions.", author:"Dalai Lama", category:"happiness" },
+    { quote:"The only way to do great work is to love what you do.", author:"Steve Jobs", category:"success" },
+    { quote:"Believe you can and you're halfway there.", author:"Theodore Roosevelt", category:"motivation" },
+    { quote:"Happiness is a warm puppy.", author:"Charles M. Schulz", category:"happiness" },
+    { quote:"The future belongs to those who believe in the beauty of their dreams.", author:"Eleanor Roosevelt", category:"motivation" },
+    { quote:"Love all, trust a few, do wrong to none.", author:"William Shakespeare", category:"love" },
+    { quote:"Time you enjoy wasting is not wasted time.", author:"Marthe Troly-Curtin", category:"happiness" },
+    { quote:"It always seems impossible until it's done.", author:"Nelson Mandela", category:"motivation" },
+    { quote:"Hardships often prepare ordinary people for an extraordinary destiny.", author:"C.S. Lewis", category:"motivation" },
+    { quote:"The best way to predict the future is to create it.", author:"Peter Drucker", category:"success" },
+    { quote:"You are never too old to set another goal or to dream a new dream.", author:"C.S. Lewis", category:"motivation" },
+    { quote:"Happiness depends upon ourselves.", author:"Aristotle", category:"happiness" },
+    { quote:"Love is composed of a single soul inhabiting two bodies.", author:"Aristotle", category:"love" }
+  ];
+
+  const qtext = document.getElementById('qtext');
+  const qauthor = document.getElementById('qauthor');
+  const qcat = document.getElementById('qcat');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function dayIndex(){
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 0);
+    const diff = now - start;
+    const day = Math.floor(diff / 86400000);
+    return day % quotes.length;
+  }
+
+  function render(i){
+    const q = quotes[i];
+    qtext.textContent = '"' + q.quote + '"';
+    qauthor.textContent = '— ' + q.author;
+    qcat.textContent = q.category;
+  }
+
+  let idx = dayIndex();
+  render(idx);
+
+  if(!reduceMotion){
+    setInterval(() => {
+      qtext.classList.add('fade-out');
+      setTimeout(() => {
+        idx = (idx + 1) % quotes.length;
+        render(idx);
+        qtext.classList.remove('fade-out');
+      }, 350);
+    }, 4200);
+  }
+</script>
+
+</body>
+</html>

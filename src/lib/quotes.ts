@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { resolve, join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import * as z from "zod/v4";
@@ -106,4 +106,48 @@ export function listCategories(): string[] {
   const quotes = loadQuotes();
   const categories = new Set(quotes.map((q) => q.category));
   return Array.from(categories).sort();
+}
+
+function saveQuotes(quotes: Quote[]): void {
+  const path = resolveDataPath("quotes.json");
+  writeFileSync(path, JSON.stringify(quotes, null, 2) + "\n", "utf-8");
+}
+
+function nextId(quotes: Quote[]): number {
+  if (quotes.length === 0) return 1;
+  return Math.max(...quotes.map((q) => q.id)) + 1;
+}
+
+export function addQuote(
+  quote: string,
+  author: string,
+  category: string
+): Quote {
+  const quotes = loadQuotes();
+  const newQuote: Quote = { id: nextId(quotes), quote, author, category };
+  quotes.push(newQuote);
+  saveQuotes(quotes);
+  return newQuote;
+}
+
+export function updateQuote(
+  id: number,
+  updates: Partial<Omit<Quote, "id">>
+): Quote | null {
+  const quotes = loadQuotes();
+  const index = quotes.findIndex((q) => q.id === id);
+  if (index === -1) return null;
+
+  quotes[index] = { ...quotes[index], ...updates };
+  saveQuotes(quotes);
+  return quotes[index];
+}
+
+export function deleteQuote(id: number): boolean {
+  const quotes = loadQuotes();
+  const filtered = quotes.filter((q) => q.id !== id);
+  if (filtered.length === quotes.length) return false;
+
+  saveQuotes(filtered);
+  return true;
 }

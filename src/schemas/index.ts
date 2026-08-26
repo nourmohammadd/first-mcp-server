@@ -42,13 +42,56 @@ Tool: get_quote_by_author
 */
 export const getQuoteByAuthorInputSchema = z.object({
   author: z
-    .string()
-    .min(1)
-    .max(100)
-    .describe("Author name to filter quotes by."),
+  .string()
+  .trim()
+  .min(1)
+  .max(100)
+  .describe("Author name to filter quotes by."),
 });
 
 /*
 Tool: list_categories
 */
 export const listCategoriesInputSchema = z.object({});
+
+
+/*
+Tool: add_quote
+*/
+export const addQuoteInputSchema = z.object({
+  quote: z
+    .string()
+    .trim()
+    .min(1)
+    .max(500)
+    .describe("The quote text."),
+  author: z
+    .string()
+    .trim()
+    .min(1)
+    .max(100)
+    .describe("The author of the quote."),
+  category: z
+    .string()
+    .trim()
+    .min(1)
+    .max(50)
+    .describe("The category this quote belongs to."),
+});
+
+/*
+Tool: update_quote
+*/
+export const updateQuoteInputSchema = z.object({
+  id: z.number().int().positive().describe("ID of the quote to update."),
+  quote: z.string().trim().min(1).max(500).optional(),
+  author: z.string().trim().min(1).max(100).optional(),
+  category: z.string().trim().min(1).max(50).optional(),
+});
+
+/*
+Tool: delete_quote
+*/
+export const deleteQuoteInputSchema = z.object({
+  id: z.number().int().positive().describe("ID of the quote to delete."),
+});

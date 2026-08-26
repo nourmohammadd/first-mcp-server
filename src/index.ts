@@ -6,6 +6,10 @@ import { registerGetRandomQuote } from "./tools/getRandomQuote.js";
 import { registerSearchQuotes } from "./tools/searchQuotes.js";
 import { registerGetQuoteByAuthor } from "./tools/getQuoteByAuthor.js";
 import { registerListCategories } from "./tools/listCategories.js";
+import { registerAddQuote } from "./tools/addQuote.js";
+import { registerUpdateQuote } from "./tools/updateQuote.js";
+import { registerDeleteQuote } from "./tools/deleteQuote.js";
+
 
 function createServer(): McpServer {
   const server = new McpServer({
@@ -18,6 +22,9 @@ function createServer(): McpServer {
   registerSearchQuotes(server);
   registerGetQuoteByAuthor(server);
   registerListCategories(server);
+  registerAddQuote(server);
+  registerUpdateQuote(server);
+  registerDeleteQuote(server);
 
   return server;
 }

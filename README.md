@@ -1,5 +1,7 @@
 # First MCP Server — Quote of the Day
 
+Part of the [NextFlows MCP Academy](https://nextflows.ai/) training program.
+
 ## What it does
 An MCP server that serves quotes from a local fixture through 5 tools: get today's 
 quote, get a random quote, search by keyword, get quotes by author, and list all 

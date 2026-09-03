@@ -1,18 +1,98 @@
 [
-  { "id": 1, "quote": "In the middle of difficulty lies opportunity.", "author": "Albert Einstein", "category": "motivation" },
-  { "id": 2, "quote": "Success is where preparation and opportunity meet.", "author": "Bobby Unser", "category": "success" },
-  { "id": 3, "quote": "Don't watch the clock; do what it does. Keep going.", "author": "Sam Levenson", "category": "motivation" },
-  { "id": 4, "quote": "Happiness is not something ready made. It comes from your own actions.", "author": "Dalai Lama", "category": "happiness" },
-  { "id": 5, "quote": "The only way to do great work is to love what you do.", "author": "Steve Jobs", "category": "success" },
-  { "id": 6, "quote": "Believe you can and you're halfway there.", "author": "Theodore Roosevelt", "category": "motivation" },
-  { "id": 7, "quote": "Happiness is a warm puppy.", "author": "Charles M. Schulz", "category": "happiness" },
-  { "id": 8, "quote": "The future belongs to those who believe in the beauty of their dreams.", "author": "Eleanor Roosevelt", "category": "motivation" },
-  { "id": 9, "quote": "Love all, trust a few, do wrong to none.", "author": "William Shakespeare", "category": "love" },
-  { "id": 10, "quote": "Time you enjoy wasting is not wasted time.", "author": "Marthe Troly-Curtin", "category": "happiness" },
-  { "id": 11, "quote": "It always seems impossible until it's done.", "author": "Nelson Mandela", "category": "motivation" },
-  { "id": 12, "quote": "Hardships often prepare ordinary people for an extraordinary destiny.", "author": "C.S. Lewis", "category": "motivation" },
-  { "id": 13, "quote": "The best way to predict the future is to create it.", "author": "Peter Drucker", "category": "success" },
-  { "id": 14, "quote": "You are never too old to set another goal or to dream a new dream.", "author": "C.S. Lewis", "category": "motivation" },
-  { "id": 15, "quote": "Happiness depends upon ourselves.", "author": "Aristotle", "category": "happiness" },
-  { "id": 16, "quote": "Love is composed of a single soul inhabiting two bodies.", "author": "Aristotle", "category": "love" }
+  {
+    "id": 1,
+    "quote": "In the middle of difficulty lies opportunity.",
+    "author": "Albert Einstein",
+    "category": "motivation"
+  },
+  {
+    "id": 2,
+    "quote": "Success is where preparation and opportunity meet.",
+    "author": "Bobby Unser",
+    "category": "success"
+  },
+  {
+    "id": 3,
+    "quote": "Don't watch the clock; do what it does. Keep going.",
+    "author": "Sam Levenson",
+    "category": "motivation"
+  },
+  {
+    "id": 4,
+    "quote": "Happiness is not something ready made. It comes from your own actions.",
+    "author": "Dalai Lama",
+    "category": "happiness"
+  },
+  {
+    "id": 5,
+    "quote": "The only way to do great work is to love what you do.",
+    "author": "Steve Jobs",
+    "category": "success"
+  },
+  {
+    "id": 6,
+    "quote": "Believe you can and you're halfway there.",
+    "author": "Theodore Roosevelt",
+    "category": "motivation"
+  },
+  {
+    "id": 7,
+    "quote": "Happiness is a warm puppy.",
+    "author": "Charles M. Schulz",
+    "category": "happiness"
+  },
+  {
+    "id": 8,
+    "quote": "The future belongs to those who believe in the beauty of their dreams.",
+    "author": "Eleanor Roosevelt",
+    "category": "motivation"
+  },
+  {
+    "id": 9,
+    "quote": "Love all, trust a few, do wrong to none.",
+    "author": "William Shakespeare",
+    "category": "love"
+  },
+  {
+    "id": 10,
+    "quote": "Time you enjoy wasting is not wasted time.",
+    "author": "Marthe Troly-Curtin",
+    "category": "happiness"
+  },
+  {
+    "id": 11,
+    "quote": "It always seems impossible until it's done.",
+    "author": "Nelson Mandela",
+    "category": "motivation"
+  },
+  {
+    "id": 12,
+    "quote": "Hardships often prepare ordinary people for an extraordinary destiny.",
+    "author": "C.S. Lewis",
+    "category": "motivation"
+  },
+  {
+    "id": 13,
+    "quote": "The best way to predict the future is to create it.",
+    "author": "Peter Drucker",
+    "category": "success"
+  },
+  {
+    "id": 14,
+    "quote": "You are never too old to set another goal or to dream a new dream.",
+    "author": "C.S. Lewis",
+    "category": "motivation"
+  },
+  {
+    "id": 15,
+    "quote": "Happiness depends upon ourselves.",
+    "author": "Aristotle",
+    "category": "happiness"
+  },
+  {
+    "id": 16,
+    "quote": "Love is composed of a single soul inhabiting two bodies.",
+    "author": "Aristotle",
+    "category": "love"
+  }
 ]
